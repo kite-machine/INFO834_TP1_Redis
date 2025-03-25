@@ -11,7 +11,7 @@ session_start();
     <?php if (isset($_SESSION['user'])): ?>
         <p>Connecté en tant que <?= htmlspecialchars($_SESSION['user']) ?></p>
         <a href="services.php">Voir les livres</a> |
-        <a href="logout.php">Déconnexion</a>
+        <a href="login.php">Déconnexion</a>
     <?php else: ?>
         <a href="login.php">Connexion</a>
     <?php endif; ?>
