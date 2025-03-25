@@ -25,7 +25,7 @@ def check_user(email, temp_password):
             # Vérification des connexions dans Redis et ajout des informations récentes
             return check_redis_connections(email)
         else:
-            return "unauthorized"
+            return "unauthorized ,mot de passe incorrect"
 
     except pymysql.MySQLError as e:
         print(f"Erreur de connexion à MySQL : {e}")
@@ -52,12 +52,10 @@ def check_redis_connections(email):
     # Limiter la liste à conserver uniquement les connexions dans les 10 dernières minutes
     r.ltrim(redis_key, -10, -1)
     
-    # Ajouter l'utilisateur à la liste des utilisateurs récents
     redis_key_recent_users = "recent_users"
     r.rpush(redis_key_recent_users, email)
     r.ltrim(redis_key_recent_users, -10, -1)  # Limiter à 10 derniers utilisateurs
     
-    # Incrémenter le compteur de connexions de l'utilisateur
     redis_key_connections_count = f"user:{email}:connections_count"
     r.incr(redis_key_connections_count)
     
