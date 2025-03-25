@@ -1,9 +1,19 @@
 <?php
 session_start();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_SESSION['user'] = $_POST['username'];
-    header('Location: accueil.php');
-    exit;
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $is_authorized = shell_exec("python3 redis_client.py check " . escapeshellarg($email) . " " . escapeshellarg($password));
+    
+    if (trim($is_authorized) === "authorized") {
+        $_SESSION['user'] = $email;
+        header('Location: accueil.php');
+        exit;
+    } else {
+        echo "Email ou mot de passe incorrect.";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -14,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <h1>Connexion</h1>
     <form method="post">
-        <label>Nom d'utilisateur: <input type="text" name="username" required></label>
+        <label>Email: <input type="email" name="email" required></label><br>
+        <label>Mot de passe: <input type="password" name="password" required></label><br>
         <button type="submit">Se connecter</button>
     </form>
 </body>
