@@ -5,9 +5,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $is_authorized = shell_exec("python3 redis_client.py check " . escapeshellarg($email) . " " . escapeshellarg($password));
+    // Exécution du script Python en passant l'email et le mot de passe
+    $is_authorized = trim(shell_exec("python redis_client.py " . escapeshellarg($email) . " " . escapeshellarg($password)));
     
-    if (trim($is_authorized) === "authorized") {
+    // Vérification de la sortie du script Python
+    if ($is_authorized === "authorized") {
         $_SESSION['user'] = $email;
         header('Location: accueil.php');
         exit;
@@ -16,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>

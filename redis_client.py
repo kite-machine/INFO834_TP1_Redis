@@ -1,24 +1,28 @@
-import redis
-import sys
 import pymysql
-from config import host, user, password
+import sys
+from config import host, user, password, database
 
-def check_user(email, password):
-    db = pymysql.connect(host, user, password, database='tp1')
-    cursor = db.cursor()
-    
-    query = "SELECT email FROM users WHERE email = %s AND password = %s"
-    cursor.execute(query, (email, password))
-    result = cursor.fetchone()
-    
-    db.close()
-    return result is not None
+def check_user(email, temp_password):
+    try:
+        db = pymysql.connect(host=host, user=user, password=password, database=database)
+        cursor = db.cursor()
+        query = "SELECT email FROM utilisateur WHERE email = %s AND mdp = %s"
+        cursor.execute(query, (email, temp_password))
+        result = cursor.fetchone()
+
+        db.close()
+
+        # Si un résultat est trouvé, l'utilisateur est autorisé
+        if result:
+            return "authorized"
+        else:
+            return "unauthorized"
+
+    except pymysql.MySQLError as e:
+        print(f"Erreur de connexion : {e}")
+        return "error"
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2 and sys.argv[1] == "check":
-        email = sys.argv[2]
-        password = sys.argv[3]
-        if check_user(email, password):
-            print("authorized")
-        else:
-            print("unauthorized")
+    email = sys.argv[1]
+    temp_password = sys.argv[2]
+    print(check_user(email, temp_password))
